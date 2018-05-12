@@ -6,8 +6,7 @@ using System.IO;
 using UnityEngine.SceneManagement;
 
 public class ARCapture : MonoBehaviour {
-	private GameObject captureButton;
-	private GameObject galleryButton;
+	private GameObject buttonPanel;
 	private Text errorText;
 
 	//flash
@@ -18,17 +17,15 @@ public class ARCapture : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		Screen.orientation = ScreenOrientation.AutoRotation;
-		captureButton = GameObject.Find ("Capture");
-		galleryButton = GameObject.Find ("Gallery");
+		buttonPanel = GameObject.Find ("ButtonPanel");
 		errorText = GameObject.Find ("Error").GetComponent<Text>();
 
 		//flash
 		flashPanel = GameObject.Find ("FlashPanel").GetComponent<Image>();
 		flashPanel.CrossFadeAlpha (0.0f, 0.1f, false);
 
-		//Load
-		SaveLoad.loadImageName(); //temporary, should be execute at start menu
-		SaveLoad.loadImageTexture();
+		//temporary, should be execute at start menu
+		SaveLoad.loadAll();
 
 		// Get a reference to the storage service, using the default Firebase App
 		//Firebase.Storage.FirebaseStorage storage = Firebase.Storage.FirebaseStorage.DefaultInstance;
@@ -38,13 +35,15 @@ public class ARCapture : MonoBehaviour {
 	}
 
 	public IEnumerator screenshot(){
-		captureButton.SetActive (false);
-		galleryButton.SetActive (false);
+		buttonPanel.SetActive (false);
 		yield return new WaitForEndOfFrame();
 		//take screen shot
 
-		Texture2D screenTexture = new Texture2D(Screen.width, Screen.height,TextureFormat.RGB24,true);
-		screenTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, true);
+		Texture2D screenTexture = new Texture2D(Screen.width, Screen.height-(int)(Screen.height*0.1f),TextureFormat.RGB24,true);
+		//normally like this:
+		//screenTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, true);
+		//try to cut out lower part (the watermark) to fit gallery preview
+		screenTexture.ReadPixels(new Rect(0, (int)(Screen.height*0.1f), Screen.width, Screen.height), 0, 0, false);
 		screenTexture.Apply();
 
 		//flash
@@ -63,14 +62,26 @@ public class ARCapture : MonoBehaviour {
 
 			File.WriteAllBytes(destination+ "/" + filename, dataToSave);
 			SaveLoad.saveImageName(filename,screenTexture);
+			//refresh Gallery App
+			/*
+			using (AndroidJavaClass jcUnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+			using (AndroidJavaObject joActivity = jcUnityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+			using (AndroidJavaObject joContext = joActivity.Call<AndroidJavaObject>("getApplicationContext"))
+			using (AndroidJavaClass jcMediaScannerConnection = new AndroidJavaClass("android.media.MediaScannerConnection"))
+			using (AndroidJavaClass jcEnvironment = new AndroidJavaClass("android.os.Environment"))
+			using (AndroidJavaObject joExDir = jcEnvironment.CallStatic<AndroidJavaObject>("getExternalStorageDirectory"))
+			{
+				jcMediaScannerConnection.CallStatic("scanFile", joContext, new string[] { destination+ "/" + filename }, null, null);
+			}*/
+
+
 		} catch (System.Exception ex) {
 			errorText.text = ex.ToString();
 		}
 		flashPanel.CrossFadeAlpha (0.0f, FlashDuration, false);
 		yield return new WaitForSeconds (FlashDuration-0.1f);
 		//errorText.text = "Finished Capturing.. Uploading...";
-		captureButton.SetActive (true);
-		galleryButton.SetActive (true);
+		buttonPanel.SetActive (true);
 
 	}
 

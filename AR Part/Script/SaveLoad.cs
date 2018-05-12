@@ -7,6 +7,7 @@ public static class SaveLoad{
 	public static List<string> imageName;
 	public static List<Texture2D> imageTexture;
 	public static string path = Application.persistentDataPath + "/../../../../Pictures/ARBuddhistFestival2018";
+	public static bool firstrun = true;
 
 	//call this method first at the start of the app
 	public static void loadImageName(){
@@ -41,17 +42,21 @@ public static class SaveLoad{
 		}
 		if (missingIndex.Count>0) {
 			//remove missing file
-			for (int i = 0; i < missingIndex.Count; i++) {
-				Debug.Log ("missing file: " + imageName [missingIndex [i]]);
+			for (int i = missingIndex.Count-1; i >= 0; i--) {
 				imageName.RemoveAt (missingIndex [i]);
 
 			}
 			//refresh save file
 			PlayerPrefs.SetString("ImageName",string.Join(",", imageName.ToArray()));
 		}
+	}
 
-
-
+	public static void loadAll(){
+		if (firstrun) {
+			SaveLoad.loadImageName();
+			SaveLoad.loadImageTexture();
+			firstrun = false;
+		}
 	}
 
 	public static void saveImageName(string filename, Texture2D texture){
@@ -59,4 +64,6 @@ public static class SaveLoad{
 		imageTexture.Add (texture);
 		PlayerPrefs.SetString("ImageName",string.Join(",", imageName.ToArray()));
 	}
+
+
 }

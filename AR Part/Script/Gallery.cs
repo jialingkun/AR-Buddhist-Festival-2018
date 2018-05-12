@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Gallery : MonoBehaviour {
 	public GameObject galleryImagePrefab;
@@ -13,23 +14,26 @@ public class Gallery : MonoBehaviour {
 	public int padding;
 	public int gap;
 
+	//preview image
+	private GameObject preview;
+	private GameObject imagePreview;
+
 
 
 
 	// Use this for initialization
 	void Start () {
-		
+		//preview image
+		preview = GameObject.Find ("Preview");
+		imagePreview = GameObject.Find ("ImagePreview");
+		preview.SetActive (false);
+
+		//scroll content
 		content = GameObject.Find ("Content").GetComponent<RectTransform> ();
 		//x Coordinate spawn
 		spawnPointLeft = GameObject.Find ("SpawnPointLeft").GetComponent<RectTransform> ().anchoredPosition.x;
 
 		refreshGallery ();
-	}
-
-
-
-	public void clickGalleryImage(int index){
-		print("WOW "+index);
 	}
 
 	public void refreshGallery(){
@@ -85,5 +89,18 @@ public class Gallery : MonoBehaviour {
 		//The last position after for loop only store (last position + gap), so convert it back to last position by - gap
 		content.sizeDelta = new Vector2 (content.sizeDelta.x, - galleryNextPositionY - (galleryImageOffset + galleryImageOffset / gap) + (galleryImageOffset/2 + galleryImageOffset/padding));
 
+	}
+
+
+	public void clickGalleryImage(int index){
+		imagePreview.GetComponent<RawImage> ().texture = SaveLoad.imageTexture[index];
+		float ratio = (float)SaveLoad.imageTexture[index].width / (float)SaveLoad.imageTexture[index].height;
+		imagePreview.GetComponent<AspectRatioFitter> ().aspectRatio = ratio;
+		preview.SetActive (true);
+	}
+
+
+	public void clickARCamera(){
+		SceneManager.LoadScene (0); //temporary scene index
 	}
 }
