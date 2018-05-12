@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 public class ARCapture : MonoBehaviour {
 	private GameObject captureButton;
+	private GameObject galleryButton;
 	private Text errorText;
 
 	//flash
@@ -17,13 +19,16 @@ public class ARCapture : MonoBehaviour {
 	void Start () {
 		Screen.orientation = ScreenOrientation.AutoRotation;
 		captureButton = GameObject.Find ("Capture");
+		galleryButton = GameObject.Find ("Gallery");
 		errorText = GameObject.Find ("Error").GetComponent<Text>();
+
+		//flash
 		flashPanel = GameObject.Find ("FlashPanel").GetComponent<Image>();
 		flashPanel.CrossFadeAlpha (0.0f, 0.1f, false);
 
 		//Load
 		SaveLoad.loadImageName(); //temporary, should be execute at start menu
-		print (SaveLoad.imageNameList.Count);
+		SaveLoad.loadImageTexture();
 
 		// Get a reference to the storage service, using the default Firebase App
 		//Firebase.Storage.FirebaseStorage storage = Firebase.Storage.FirebaseStorage.DefaultInstance;
@@ -31,14 +36,10 @@ public class ARCapture : MonoBehaviour {
 		// Create a storage reference from our storage service
 		//Firebase.Storage.StorageReference storage_ref = storage.GetReferenceFromUrl("gs://buddhist-festival-ar-2018.appspot.com");
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
 	public IEnumerator screenshot(){
 		captureButton.SetActive (false);
+		galleryButton.SetActive (false);
 		yield return new WaitForEndOfFrame();
 		//take screen shot
 
@@ -52,7 +53,7 @@ public class ARCapture : MonoBehaviour {
 
 		//save screen shot
 		byte[] dataToSave = screenTexture.EncodeToPNG();
-		string destination = Application.persistentDataPath + "/../../../../Pictures/ARBuddhistFestival2018";
+		string destination = SaveLoad.path;
 		string filename = System.DateTime.Now.ToString("yyyymmdd_hhmmss")+".png";
 		try {
 			if (!Directory.Exists(destination))
@@ -61,7 +62,7 @@ public class ARCapture : MonoBehaviour {
 			}
 
 			File.WriteAllBytes(destination+ "/" + filename, dataToSave);
-			SaveLoad.saveImageName(filename);
+			SaveLoad.saveImageName(filename,screenTexture);
 		} catch (System.Exception ex) {
 			errorText.text = ex.ToString();
 		}
@@ -69,10 +70,15 @@ public class ARCapture : MonoBehaviour {
 		yield return new WaitForSeconds (FlashDuration-0.1f);
 		//errorText.text = "Finished Capturing.. Uploading...";
 		captureButton.SetActive (true);
+		galleryButton.SetActive (true);
 
 	}
 
 	public void clickCapture(){
 		StartCoroutine (screenshot ());
+	}
+
+	public void clickGallery(){
+		SceneManager.LoadScene (1); //temporary scene index
 	}
 }
