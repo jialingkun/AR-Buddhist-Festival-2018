@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 
 public class ARCapture : MonoBehaviour {
 	private GameObject buttonPanel;
+	private GameObject portraitLayout;
+	private GameObject landscapeLayout;
 	private Text errorText;
 
 	//flash
@@ -14,10 +16,22 @@ public class ARCapture : MonoBehaviour {
 	public float FlashIntensity = 0.7f;
 	public float FlashDuration = 0.7f;
 
+	//device rotation
+	private bool isPortrait;
+
 	// Use this for initialization
 	void Start () {
 		Screen.orientation = ScreenOrientation.AutoRotation;
 		buttonPanel = GameObject.Find ("ButtonPanel");
+		portraitLayout = GameObject.Find ("PortraitLayout");
+		landscapeLayout = GameObject.Find ("LandscapeLayout");
+		//default portrait
+		isPortrait = true;
+		landscapeLayout.SetActive (false);
+		portraitLayout.SetActive (true);
+
+
+
 		errorText = GameObject.Find ("Error").GetComponent<Text>();
 
 		//flash
@@ -34,16 +48,35 @@ public class ARCapture : MonoBehaviour {
 		//Firebase.Storage.StorageReference storage_ref = storage.GetReferenceFromUrl("gs://buddhist-festival-ar-2018.appspot.com");
 	}
 
+	void Update(){
+		if (Input.deviceOrientation == DeviceOrientation.Portrait) {
+			if (!isPortrait) {
+				isPortrait = true;
+				landscapeLayout.SetActive (false);
+				portraitLayout.SetActive (true);
+			}
+		} else if(Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight) {
+			if (isPortrait) {
+				isPortrait = false;
+				portraitLayout.SetActive (false);
+				landscapeLayout.SetActive (true);
+			}
+		}
+	}
+
 	public IEnumerator screenshot(){
 		buttonPanel.SetActive (false);
 		yield return new WaitForEndOfFrame();
 		//take screen shot
 
-		Texture2D screenTexture = new Texture2D(Screen.width, Screen.height-(int)(Screen.height*0.1f),TextureFormat.RGB24,true);
-		//normally like this:
-		//screenTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, true);
+		Texture2D screenTexture = new Texture2D(Screen.width, Screen.height,TextureFormat.RGB24,true);
+		screenTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, true);
+
+		//this is code to crop lower part(watermark)
+		//Texture2D screenTexture = new Texture2D(Screen.width, Screen.height-(int)(Screen.height*0.1f),TextureFormat.RGB24,true);
 		//try to cut out lower part (the watermark) to fit gallery preview
-		screenTexture.ReadPixels(new Rect(0, (int)(Screen.height*0.1f), Screen.width, Screen.height), 0, 0, false);
+		//screenTexture.ReadPixels(new Rect(0, (int)(Screen.height*0.1f), Screen.width, Screen.height), 0, 0, false);
+
 		screenTexture.Apply();
 
 		//flash
@@ -63,7 +96,7 @@ public class ARCapture : MonoBehaviour {
 			File.WriteAllBytes(destination+ "/" + filename, dataToSave);
 			SaveLoad.saveImageName(filename,screenTexture);
 			//refresh Gallery App
-			/*
+
 			using (AndroidJavaClass jcUnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
 			using (AndroidJavaObject joActivity = jcUnityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
 			using (AndroidJavaObject joContext = joActivity.Call<AndroidJavaObject>("getApplicationContext"))
@@ -72,7 +105,7 @@ public class ARCapture : MonoBehaviour {
 			using (AndroidJavaObject joExDir = jcEnvironment.CallStatic<AndroidJavaObject>("getExternalStorageDirectory"))
 			{
 				jcMediaScannerConnection.CallStatic("scanFile", joContext, new string[] { destination+ "/" + filename }, null, null);
-			}*/
+			}
 
 
 		} catch (System.Exception ex) {

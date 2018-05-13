@@ -14,6 +14,9 @@ public class Gallery : MonoBehaviour {
 	public int padding;
 	public int gap;
 
+	//delete
+	private GameObject confirmDelete;
+	private int activeIndex = 0;
 	//preview image
 	private GameObject preview;
 	private GameObject imagePreview;
@@ -21,12 +24,20 @@ public class Gallery : MonoBehaviour {
 
 
 
+
+
 	// Use this for initialization
 	void Start () {
+		Screen.orientation = ScreenOrientation.Portrait;
+
+		confirmDelete = GameObject.Find ("ConfirmDelete");
+		confirmDelete.SetActive (false);
 		//preview image
 		preview = GameObject.Find ("Preview");
 		imagePreview = GameObject.Find ("ImagePreview");
 		preview.SetActive (false);
+
+
 
 		//scroll content
 		content = GameObject.Find ("Content").GetComponent<RectTransform> ();
@@ -97,10 +108,34 @@ public class Gallery : MonoBehaviour {
 		float ratio = (float)SaveLoad.imageTexture[index].width / (float)SaveLoad.imageTexture[index].height;
 		imagePreview.GetComponent<AspectRatioFitter> ().aspectRatio = ratio;
 		preview.SetActive (true);
+
+		//store index for delete
+		activeIndex = index;
 	}
 
 
 	public void clickARCamera(){
 		SceneManager.LoadScene (0); //temporary scene index
+	}
+
+	public void clickBackToGallery(){
+		preview.SetActive (false);
+	}
+
+	public void clickDelete(){
+		confirmDelete.SetActive (true);
+	}
+
+	public void clickCancelDelete(){
+		confirmDelete.SetActive (false);
+	}
+
+	public void clickConfirmDelete(){
+		confirmDelete.SetActive (false);
+		preview.SetActive (false);
+
+		SaveLoad.deleteImage (activeIndex);
+
+		refreshGallery ();
 	}
 }

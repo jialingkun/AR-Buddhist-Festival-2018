@@ -65,5 +65,17 @@ public static class SaveLoad{
 		PlayerPrefs.SetString("ImageName",string.Join(",", imageName.ToArray()));
 	}
 
+	public static void deleteImage(int deleteIndex){
+		//deleting
+		string deletePath = path + "/" + imageName [deleteIndex];
+		if (File.Exists (deletePath)) {
+			File.Delete (deletePath);
+		}
+
+		imageName.RemoveAt (deleteIndex);
+		imageTexture.RemoveAt (deleteIndex);
+		PlayerPrefs.SetString("ImageName",string.Join(",", imageName.ToArray()));
+	}
+
 
 }
