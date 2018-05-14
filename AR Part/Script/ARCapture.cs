@@ -40,12 +40,6 @@ public class ARCapture : MonoBehaviour {
 
 		//temporary, should be execute at start menu
 		SaveLoad.loadAll();
-
-		// Get a reference to the storage service, using the default Firebase App
-		//Firebase.Storage.FirebaseStorage storage = Firebase.Storage.FirebaseStorage.DefaultInstance;
-
-		// Create a storage reference from our storage service
-		//Firebase.Storage.StorageReference storage_ref = storage.GetReferenceFromUrl("gs://buddhist-festival-ar-2018.appspot.com");
 	}
 
 	void Update(){
