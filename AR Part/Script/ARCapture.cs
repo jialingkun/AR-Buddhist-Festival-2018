@@ -80,7 +80,7 @@ public class ARCapture : MonoBehaviour {
 		//save screen shot
 		byte[] dataToSave = screenTexture.EncodeToPNG();
 		string destination = SaveLoad.path;
-		string filename = System.DateTime.Now.ToString("yyyymmdd_hhmmss")+".png";
+		string filename = System.DateTime.Now.ToString("yyyyMMdd_HHmmss")+".png";
 		try {
 			if (!Directory.Exists(destination))
 			{
@@ -89,9 +89,8 @@ public class ARCapture : MonoBehaviour {
 
 			File.WriteAllBytes(destination+ "/" + filename, dataToSave);
 			SaveLoad.saveImageName(filename,screenTexture);
+
 			//refresh Gallery App
-
-
 			using (AndroidJavaClass jcUnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
 			using (AndroidJavaObject joActivity = jcUnityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
 			using (AndroidJavaObject joContext = joActivity.Call<AndroidJavaObject>("getApplicationContext"))

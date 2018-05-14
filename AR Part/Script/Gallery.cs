@@ -225,13 +225,13 @@ public class Gallery : MonoBehaviour {
 			byte[] custom_bytes = SaveLoad.imageTexture[activeIndex].EncodeToPNG();
 
 			status.text = "Sedang Meng-upload Foto.\nMohon tunggu...";
-			// Create file metadata including the content type
 
-			Firebase.Storage.MetadataChange new_metadata = new Firebase.Storage.MetadataChange();
-			new_metadata.ContentType = "image/png";
+			// Create file metadata including the content type
+			//Firebase.Storage.MetadataChange new_metadata = new Firebase.Storage.MetadataChange();
+			//new_metadata.ContentType = "image/png";
 
 			// Upload the file to the path "images/rivers.jpg"
-			/*images_ref.PutBytesAsync(custom_bytes, new_metadata)
+			images_ref.PutBytesAsync(custom_bytes)
 				.ContinueWith ((task) => {
 					if (task.IsFaulted || task.IsCanceled) {
 						status.text = "Gagal mengupload foto.\n Pesan error:\n"+ task.Exception.ToString();
@@ -239,11 +239,11 @@ public class Gallery : MonoBehaviour {
 						// Uh-oh, an error occurred!
 					} else {
 						// Metadata contains file metadata such as size, content-type, and download URL.
-						Firebase.Storage.StorageMetadata metadata = task.Result;
+						//Firebase.Storage.StorageMetadata metadata = task.Result;
 						status.text = "Upload selesai. Terima kasih sudah berpartisipasi dalam lomba foto.";
 						closeStatus.SetActive (true);
 					}
-				});*/
+				});
 			
 		} catch (System.Exception ex) {
 			status.text = "Gagal mengupload foto.\n Pesan error:\n"+ ex.ToString();
