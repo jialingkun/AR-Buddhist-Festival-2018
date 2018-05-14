@@ -226,12 +226,13 @@ public class Gallery : MonoBehaviour {
 
 			status.text = "Sedang Meng-upload Foto.\nMohon tunggu...";
 			// Create file metadata including the content type
+
 			Firebase.Storage.MetadataChange new_metadata = new Firebase.Storage.MetadataChange();
 			new_metadata.ContentType = "image/png";
 
 			// Upload the file to the path "images/rivers.jpg"
-			images_ref.PutBytesAsync(custom_bytes, new_metadata)
-				.ContinueWith (task => {
+			/*images_ref.PutBytesAsync(custom_bytes, new_metadata)
+				.ContinueWith ((task) => {
 					if (task.IsFaulted || task.IsCanceled) {
 						status.text = "Gagal mengupload foto.\n Pesan error:\n"+ task.Exception.ToString();
 						closeStatus.SetActive (true);
@@ -242,7 +243,8 @@ public class Gallery : MonoBehaviour {
 						status.text = "Upload selesai. Terima kasih sudah berpartisipasi dalam lomba foto.";
 						closeStatus.SetActive (true);
 					}
-				});
+				});*/
+			
 		} catch (System.Exception ex) {
 			status.text = "Gagal mengupload foto.\n Pesan error:\n"+ ex.ToString();
 			closeStatus.SetActive (true);
