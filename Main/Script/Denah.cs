@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class Denah : MonoBehaviour {
+	//user guide
+	private GameObject guide;
+
 	//info
-	private GameObject Info;
 	private GameObject PosAshoka;
 
 	//zoom and pan
@@ -47,15 +50,18 @@ public class Denah : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		Screen.orientation = ScreenOrientation.Portrait;
+
 		//load all, should be execute at start menu
 		SaveLoad.loadAll();
 
+		//user guide
+		guide = GameObject.Find ("Guide");
+
 		//info
-		Info = GameObject.Find ("Info");
 		PosAshoka = GameObject.Find ("PosAshoka");
 
-		PosAshoka.SetActive (false);
-		Info.SetActive (false);
+		hideInfo (PosAshoka);
 
 
 		//zoom and pan
@@ -191,13 +197,30 @@ public class Denah : MonoBehaviour {
 	}
 
 	public void CloseInfo(){
-		PosAshoka.SetActive (false);
-		Info.SetActive (false);
+		hideInfo (EventSystem.current.currentSelectedGameObject.transform.parent.gameObject);
 	}
 
-	public void clickPosAshoka(){
-		Info.SetActive (true);
-		PosAshoka.SetActive (true);
+	public void clickPos(GameObject posObject){
+		showInfo (posObject);
+	}
 
+	public void CloseGuide(){
+		guide.SetActive (false);
+	}
+
+	private void showInfo(GameObject posObject){
+		
+		posObject.GetComponent<RectTransform> ().localPosition = Vector3.zero;
+
+		RectTransform content = posObject.transform.Find ("Scroll View/Viewport/Content").GetComponent<RectTransform> ();
+		Vector3 contentPosition = content.anchoredPosition;
+		contentPosition.y = 0;
+		content.anchoredPosition = contentPosition;
+	}
+
+	private void hideInfo(GameObject posObject){
+		Vector3 posPosition = posObject.GetComponent<RectTransform> ().localPosition;
+		posPosition.x = 1000; //throw it outside canvas, canvas x point is -800 to 800
+		posObject.GetComponent<RectTransform> ().localPosition = posPosition;
 	}
 }

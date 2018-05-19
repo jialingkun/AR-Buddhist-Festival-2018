@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
-using UnityEngine.SceneManagement;
 
 public class ARCapture : MonoBehaviour {
 	private GameObject buttonPanel;
@@ -111,9 +110,5 @@ public class ARCapture : MonoBehaviour {
 
 	public void clickCapture(){
 		StartCoroutine (screenshot ());
-	}
-
-	public void clickGallery(){
-		SceneManager.LoadScene (2); //temporary scene index
 	}
 }
