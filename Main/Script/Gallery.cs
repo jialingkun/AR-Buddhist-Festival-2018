@@ -24,10 +24,15 @@ public class Gallery : MonoBehaviour {
 	private GameObject formDaftar;
 	//tanpa daftar
 	private GameObject uploadPanel;
+
+
 	//upload status
 	private Text status;
 	private GameObject closeStatus;
 	private GameObject uploadStatus;
+	//animate wait status
+	private Text waitAnimate;
+	private bool isanimate;
 	//lomba
 	private GameObject confirmLomba;
 
@@ -55,6 +60,7 @@ public class Gallery : MonoBehaviour {
 		formDaftar = GameObject.Find("FormDaftar");
 		uploadPanel = GameObject.Find("UploadPanel");
 		status = GameObject.Find("Status").GetComponent<Text>();
+		waitAnimate = GameObject.Find("WaitAnimate").GetComponent<Text>();
 		closeStatus = GameObject.Find("CloseStatus");
 		uploadStatus = GameObject.Find("UploadStatus");
 		confirmLomba = GameObject.Find("ConfirmLomba");
@@ -203,7 +209,8 @@ public class Gallery : MonoBehaviour {
 		uploadStatus.SetActive (true);
 		closeStatus.SetActive (false);
 
-		status.text = "Sedang mempersiapkan file.\nMohon tunggu...";
+		status.text = "Sedang mempersiapkan file.";
+		StartCoroutine (AnimateText());
 		try {
 			// Get a reference to the storage service, using the default Firebase App
 			Firebase.Storage.FirebaseStorage storage = Firebase.Storage.FirebaseStorage.DefaultInstance;
@@ -218,7 +225,7 @@ public class Gallery : MonoBehaviour {
 			// Data in memory
 			byte[] custom_bytes = SaveLoad.imageTexture[activeIndex].EncodeToPNG();
 
-			status.text = "Sedang Meng-upload Foto.\nMohon tunggu...";
+			status.text = "Sedang Meng-upload Foto";
 
 			// Create file metadata including the content type
 			//Firebase.Storage.MetadataChange new_metadata = new Firebase.Storage.MetadataChange();
@@ -228,22 +235,49 @@ public class Gallery : MonoBehaviour {
 			images_ref.PutBytesAsync(custom_bytes)
 				.ContinueWith ((task) => {
 					if (task.IsFaulted || task.IsCanceled) {
-						status.text = "Gagal mengupload foto.\n Pesan error:\n"+ task.Exception.ToString();
+						//status.text = "Gagal mengupload foto.\n Pesan error:\n"+ task.Exception.ToString();
+						status.text = "Gagal mengupload foto.";
+						isanimate = false;
 						closeStatus.SetActive (true);
 						// Uh-oh, an error occurred!
 					} else {
 						// Metadata contains file metadata such as size, content-type, and download URL.
 						//Firebase.Storage.StorageMetadata metadata = task.Result;
 						status.text = "Upload selesai. Terima kasih sudah berpartisipasi dalam lomba foto.";
+						isanimate = false;
 						closeStatus.SetActive (true);
 					}
 				});
 			
 		} catch (System.Exception ex) {
-			status.text = "Gagal mengupload foto.\n Pesan error:\n"+ ex.ToString();
+			//status.text = "Gagal mengupload foto.\n Pesan error:\n"+ ex.ToString();
+			status.text = "Gagal mengupload foto.";
+			isanimate = false;
 			closeStatus.SetActive (true);
 		}
 
+	}
+
+
+	IEnumerator AnimateText(){
+		string[] textAnimate = new string[]{ "Mohon Tunggu", "Mohon Tunggu.", "Mohon Tunggu..", "Mohon Tunggu...", "Mohon Tunggu...." };
+		float delay = 0.5f; //editable
+
+
+		isanimate = true;
+		int index = 0;
+		while (isanimate) {
+			waitAnimate.text = textAnimate [index];
+			index++;
+			if (index>=textAnimate.Length) {
+				index = 0;
+			}
+			yield return new WaitForSeconds(delay);
+		}
+
+		waitAnimate.text = "";
+
+		yield return null;
 	}
 
 }
