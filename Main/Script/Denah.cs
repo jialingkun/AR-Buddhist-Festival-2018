@@ -97,7 +97,7 @@ public class Denah : MonoBehaviour {
 		//zoom and pan
 
 		isTouching = false;
-		imageTransform = GameObject.Find("Denah").GetComponent<RectTransform> ();
+		imageTransform = GameObject.Find("DenahModel").GetComponent<RectTransform> ();
 
 		//initialize for object creation only
 		currentScale = new Vector2 (imageTransform.localScale.x, imageTransform.localScale.y);
